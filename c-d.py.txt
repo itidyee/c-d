@@ -1,0 +1,109 @@
+
+class Account:
+    def __init__(self, account_number, name):
+        self.account_number = account_number
+        self.name = name
+        self.balance = 0.0
+        self.transactions = []
+
+    def credit(self, amount):
+        if amount <= 0:
+            raise ValueError("Deposit amount must be positive.")
+        self.balance += amount
+        self.transactions.append(f"Credited: {amount}")
+
+    def debit(self, amount):
+        if amount <= 0:
+            raise ValueError("Withdrawal amount must be positive.")
+        if amount > self.balance:
+            raise ValueError("Insufficient balance.")
+        self.balance -= amount
+        self.transactions.append(f"Withdrew: {amount}")
+
+    def get_balance(self):
+        return self.balance
+
+    def display_transactions(self):
+        for transaction in self.transactions:
+            print(transaction)
+
+
+class Bank:
+    def __init__(self):
+        self.accounts = {}
+        self.last_account_number = 0  # Track the last account number
+
+    def create_account(self, name):
+        self.last_account_number += 1
+        account_number = f"{self.last_account_number:02d}"  # Format as two digits
+        if account_number in self.accounts:
+            raise ValueError("Account number already exists.")
+        self.accounts[account_number] = Account(account_number, name)
+        print(f"Account created successfully. Account Number: {account_number}")
+
+    def get_account(self, account_number):
+        return self.accounts.get(account_number, None)
+
+    def display_all_accounts(self):
+        for account in self.accounts.values():
+            print(f"Account Number: {account.account_number}, Name: {account.name}, Balance: {account.get_balance()}")
+
+
+def main():
+    bank = Bank()
+    while True:
+        print("\n1. Create Account\n2. Credit Money\n3. Withdraw Money\n4. Check Balance\n5. Display Transactions\n6. Display All Accounts\n7. Exit")
+        choice = input("Choose an option No: ")
+        if choice == '1':
+            name = input("Enter account holder name: ")
+            try:
+                bank.create_account(name)
+            except ValueError as e:
+                print(e)
+        elif choice == '2':
+            account_number = input("Enter account number: ")
+            account = bank.get_account(account_number)
+            if account:
+                try:
+                    amount = float(input("Enter deposit amount: "))
+                    account.credit(amount)
+                    print("Deposit successful.")
+                except ValueError as e:
+                    print(e)
+        elif choice == '3':
+            account_number = input("Enter account number: ")
+            account = bank.get_account(account_number)
+            if account:
+                print(f"Current Balance: {account.get_balance()}")  # Display balance before withdrawal
+                try:
+                    amount = float(input("Enter withdrawal amount: "))
+                    account.debit(amount)
+                    print("Withdrawal successful.")
+                except ValueError as e:
+                    print(e)
+            else:
+                print("Account not found.")
+        elif choice == '4':
+            account_number = input("Enter account number: ")
+            account = bank.get_account(account_number)
+            if account:
+                print(f"Account Balance: {account.get_balance()}")
+            else:
+                print("Account not found.")
+        elif choice == '5':
+            account_number = input("Enter account number: ")
+            account = bank.get_account(account_number)
+            if account:
+                account.display_transactions()
+            else:
+                print("Account not found.")
+        elif choice == '6':
+            bank.display_all_accounts()
+        elif choice == '7':
+            print("SayoNara; Thank you for using the banking system!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
